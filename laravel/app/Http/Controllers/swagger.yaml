@@ -1,0 +1,60 @@
+openapi: 3.0.0
+info:
+  title: Mi API
+  version: 1.0.0
+paths:
+  /api/completeInfo:
+    put:
+      summary: Completar información de usuario
+      description: Completa la información de un usuario, como su fecha de nacimiento y apodo.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                birthdate:
+                  type: string
+                  format: date
+                  example: "1990-01-01"
+                nickname:
+                  type: string
+                  example: "usuario123"
+      responses:
+        '200':
+          description: Información de usuario completada exitosamente
+          content:
+            application/json:
+              schema:
+                type: boolean
+                example: true
+        '400':
+          description: Error de validación
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: string
+        '401':
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Token no proporcionado en los encabezados."
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

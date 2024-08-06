@@ -1,19 +1,6 @@
-# transversals
-Esquema mínim de carpetes pels projectes transversals
+# Documentació bàsica del projecte
 
-És obligatori seguir aquesta estructura tot i que la podeu ampliar.
+La documentació tècnica del projecte es troba al següent enllaç:
+[Documentació tècnica](https://inspedralbes.github.io/Spottunes/doc_tecnica/tech.html)
 
-## Atenció
-Un cop comenceu heu de canviar aquesta explicació amb la corresponent al vostre projecte (utilitzant markdown)
-
-## Docker & Docker compose
-El projecte s'ha de poder desplegar en mode desenvolupament simplement fent docker compose up
-
-# Aquest fitxer ha de contenir com a mínim:
- * Nom dels integrants
- * Nom del projecte
- * Petita descripció
- * Adreça del gestor de tasques (taiga, jira, trello...)
- * Adreça del prototip gràfic del projecte (Penpot, figma, moqups...)
- * URL de producció (quan la tingueu)
- * Estat: (explicació d'en quin punt està)
+- La documentació de desplegament aquí: [Documentació de desplegament](https://inspedralbes.github.io/Spottunes/doc_tecnica/tech.html#desplegament)

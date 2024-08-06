@@ -1,0 +1,121 @@
+services:
+  node:
+    container_name: node
+    image: arm64v8/node
+    volumes:
+      - ./node:/usr/src/app
+    working_dir: /usr/src/app
+    ports:
+      - 8080:8080
+    command: sh -c "npm install && npm run start"
+    restart: always
+    depends_on:
+      - db
+
+  nodeChat:
+    container_name: nodeChat
+    image: arm64v8/node
+    volumes:
+      - ./nodeChat:/usr/src/app
+    working_dir: /usr/src/app
+    ports:
+      - 8085:8080
+    command: sh -c "npm install && node index.js"
+    restart: always
+    depends_on:
+      - laravel
+
+  nodeMongo:
+    container_name: nodeMongo
+    image: arm64v8/node
+    volumes:
+      - ./node:/usr/src/app
+    working_dir: /usr/src/app
+    ports:
+      - 8086:8080
+    command: sh -c "npm install && npm run mongo"
+    restart: always
+    depends_on:
+      - mongodb
+
+  phpmyadmin:
+    container_name: phpmyadmin
+    image: arm64v8/phpmyadmin
+    restart: always
+    ports:
+      - 9091:80
+    environment:
+      PMA_ABSOLUTE_URI: https://spottunes.daw.inspedralbes.cat/pma/
+    depends_on:
+      - db
+
+  laravel:
+    container_name: laravel
+    build: ./laravel
+    volumes:
+      - ./laravel:/var/www/html
+    ports:
+      - 8000:80
+    environment:
+      - APACHE_DOCUMENT_ROOT=/var/www/html/public
+    command: /bin/sh -c "composer install --no-interaction && chown -R www-data:www-data *&& chown -R www-data:www-data /var/www/html/public/images && php artisan migrate --force && apache2-foreground "
+    restart: always
+    depends_on:
+      - db
+
+  nuxt:
+    container_name: nuxt
+    image: arm64v8/node
+    working_dir: /usr/src/app
+    volumes:
+      - ./nuxt:/usr/src/app
+    ports:
+      - 3000:3000
+    environment:
+      - WATCHPACK_POLLING=true
+      - CHOKIDAR_USEPOLLING=true
+    tmpfs:
+      - /tmp
+    command: sh -c "node ./server/index.mjs -- --host=http://spottunes.daw.inspedralbes.cat:8081"
+    depends_on:
+      - node
+
+  db:
+    container_name: db
+    image: mysql:8.2.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD:
+      MYSQL_DATABASE: spottunes
+    ports:
+      - 3306:3306
+    volumes:
+      - ./mysql_data:/var/lib/mysql
+      - ./mysql/dades.sql:/docker-entrypoint-initdb.d/dades.sql
+
+  mongodb:
+    container_name: mongodb
+    image: mongo:latest
+    restart: always
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME:
+      MONGO_INITDB_ROOT_PASSWORD:
+    volumes:
+      - ./mongodb_data:/data/db
+
+  mongo-express:
+    container_name: mongo-express
+    image: arm64v8/mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME:
+      ME_CONFIG_MONGODB_ADMINPASSWORD:
+      ME_CONFIG_BASICAUTH_USERNAME:
+      ME_CONFIG_BASICAUTH_PASSWORD:
+      ME_CONFIG_MONGODB_SERVER: mongodb
+    depends_on:
+      - mongodb

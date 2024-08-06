@@ -1,0 +1,179 @@
+name: Spottunes Deploy on PreProduction Actions
+run-name: ${{ github.actor }} is deploying Spottunes in Pre-Prod Server 🚀
+on:
+  push:
+    branches:
+      - desplegament
+
+jobs:
+  stop-docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      - name: Conexión al servidor y stop de docker-compose
+        run: |
+          echo "${{ secrets.PREPROD_SECRET_KEY }}" > ~/prod_key.pem
+          chmod 600 ~/prod_key.pem
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PROD_USER }}@${{ secrets.PRE_PROD_HOST }} "docker compose down"
+      - run: echo "🍏 This job's status is ${{ job.status }}."
+
+  fill-docker-compose:
+    runs-on: ubuntu-latest
+    needs: [stop-docker]
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      - name: Conexión al servidor y modificar docker-compose
+        run: |
+          echo "Connecting to the server and running docker-compose commands"
+          echo "${{ secrets.PREPROD_SECRET_KEY }}" > ~/prod_key.pem
+          chmod 600 ~/prod_key.pem
+          sed -i 's#MYSQL_ROOT_PASSWORD:#MYSQL_ROOT_PASSWORD: ${{ secrets.DB_PASSWORD }}#g' docker-compose.yml
+          sed -i 's#MONGO_INITDB_ROOT_USERNAME:#MONGO_INITDB_ROOT_USERNAME: ${{ secrets.MONGO_INITDB_ROOT_USERNAME }}#g' docker-compose.yml
+          sed -i 's#MONGO_INITDB_ROOT_PASSWORD:#MONGO_INITDB_ROOT_PASSWORD: ${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}#g' docker-compose.yml
+          sed -i 's#ME_CONFIG_MONGODB_ADMINUSERNAME:#ME_CONFIG_MONGODB_ADMINUSERNAME: ${{ secrets.MONGO_INITDB_ROOT_USERNAME }}#g' docker-compose.yml
+          sed -i 's#ME_CONFIG_MONGODB_ADMINPASSWORD:#ME_CONFIG_MONGODB_ADMINPASSWORD: ${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}#g' docker-compose.yml
+          sed -i 's#ME_CONFIG_BASICAUTH_USERNAME:#ME_CONFIG_BASICAUTH_USERNAME: ${{ secrets.MONGO_USER }}#g' docker-compose.yml
+          sed -i 's#ME_CONFIG_BASICAUTH_PASSWORD:#ME_CONFIG_BASICAUTH_PASSWORD: ${{ secrets.MONGO_PASSWORD }}#g' docker-compose.yml
+          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i "~/prod_key.pem" -r ./docker-compose.yml ${{ secrets.PROD_USER }}@${{ secrets.PRE_PROD_HOST }}:docker-compose.yml
+      - run: echo "🍏 This job's status is ${{ job.status }}."
+
+  deployment-laravel:
+    needs: [fill-docker-compose]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      - name: Conexión al servidor y deploy de laravel
+        run: |
+          echo "${{ secrets.PREPROD_SECRET_KEY }}" > ~/prod_key.pem
+          chmod 600 ~/prod_key.pem
+          cd laravel
+          cp .env.example .env
+          sed -i 's/DB_HOST=/DB_HOST=db/g' .env
+          sed -i 's/DB_DATABASE=/DB_DATABASE=spottunes/g' .env
+          sed -i 's/DB_USERNAME=/DB_USERNAME=${{ secrets.DB_USERNAME }}/g' .env
+          sed -i 's#DB_PASSWORD=#DB_PASSWORD=${{ secrets.DB_PASSWORD }}#g' .env
+          cd ${{ github.workspace }}
+          # Cambiar permisos
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PROD_USER }}@${{ secrets.PRE_PROD_HOST }} "sudo chmod -R 777 laravel/"
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PROD_USER }}@${{ secrets.PRE_PROD_HOST }} "sudo chmod -R 777 laravel/*"
+
+          #Update laravel
+          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i "~/prod_key.pem" -r ./laravel/* ${{ secrets.PROD_USER }}@${{ secrets.PRE_PROD_HOST }}:laravel
+          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i "~/prod_key.pem" -r ./laravel/.env ${{ secrets.PROD_USER }}@${{ secrets.PRE_PROD_HOST }}:laravel
+          #Restringir permisos
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PROD_USER }}@${{ secrets.PRE_PROD_HOST }} "sudo chmod -R 775 laravel/"
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PROD_USER }}@${{ secrets.PRE_PROD_HOST }} "sudo chmod -R 775 laravel/*"
+      - run: echo "🍏 This job's status is ${{ job.status }}."
+
+  deployment-node:
+    needs: [fill-docker-compose]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      - name: Conexión al servidor y deploy de node
+        run: |
+          echo "${{ secrets.PREPROD_SECRET_KEY }}" > ~/prod_key.pem
+          chmod 600 ~/prod_key.pem
+          cd node
+          cp .env.example .env
+          sed -i 's/DB_HOST=/DB_HOST=db/g' .env
+          sed -i 's/DB_DATABASE=/DB_DATABASE=spottunes/g' .env
+          sed -i 's/DB_USERNAME=/DB_USERNAME=${{ secrets.DB_USERNAME }}/g' .env
+          sed -i 's#DB_PASSWORD=#DB_PASSWORD=${{ secrets.DB_PASSWORD }}#g' .env
+          sed -i 's#MONGO_USER=#MONGO_USER=${{ secrets.MONGO_INITDB_ROOT_USERNAME }}#g' .env
+          sed -i 's#MONGO_PASSWORD=#MONGO_PASSWORD=${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}#g' .env
+          sed -i 's#TICKETMASTER_API_KEY=#TICKETMASTER_API_KEY=${{ secrets.TICKETMASTER_API_KEY }}#g' .env
+          sed -i 's#MAPBOX_TOKEN=#MAPBOX_TOKEN=${{ secrets.MAPBOX_TOKEN }}#g' .env
+          cd ${{ github.workspace }}
+          # Eliminar node_modules
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PROD_USER }}@${{ secrets.PRE_PROD_HOST }} "sudo rm -rf node/node_modules"
+          # Dar permisos a todo
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PROD_USER }}@${{ secrets.PRE_PROD_HOST }} "sudo chmod -R 777 node/"
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PROD_USER }}@${{ secrets.PRE_PROD_HOST }} "sudo chmod -R 777 node/*"
+          # Update node
+          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i "~/prod_key.pem" -r ./node/* ${{ secrets.PROD_USER }}@${{ secrets.PRE_PROD_HOST }}:node
+          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i "~/prod_key.pem" -r ./node/.env ${{ secrets.PROD_USER }}@${{ secrets.PRE_PROD_HOST }}:node
+          # Restringir permisos
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PROD_USER }}@${{ secrets.PRE_PROD_HOST }} "sudo chmod -R 775 node/"
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PROD_USER }}@${{ secrets.PRE_PROD_HOST }} "sudo chmod -R 775 node/*"
+      - run: echo "🍏 This job's status is ${{ job.status }}."
+
+  deployment-nodeChat:
+    needs: [fill-docker-compose]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      - name: Conexión al servidor y deploy de node
+        run: |
+          echo "${{ secrets.PREPROD_SECRET_KEY }}" > ~/prod_key.pem
+          chmod 600 ~/prod_key.pem
+          cd nodeChat
+          cp .env.example .env
+          sed -i 's#API_URL=#API_URL=${{secrets.MONGO_API_PREPROD_URL}}#g' .env
+          cd ${{ github.workspace }}
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PROD_USER }}@${{ secrets.PRE_PROD_HOST }} "[ -d nodeChat ] && sudo rm -r nodeChat"
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PROD_USER }}@${{ secrets.PRE_PROD_HOST }} "mkdir nodeChat"
+          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i "~/prod_key.pem" -r ./nodeChat/* ${{ secrets.PROD_USER }}@${{ secrets.PRE_PROD_HOST }}:nodeChat
+          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i "~/prod_key.pem" -r ./nodeChat/.env ${{ secrets.PROD_USER }}@${{ secrets.PRE_PROD_HOST }}:nodeChat
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PROD_USER }}@${{ secrets.PRE_PROD_HOST }} "chmod -R 775 nodeChat/"
+      - run: echo "🍏 This job's status is ${{ job.status }}."
+
+  deployment-nuxt:
+    needs: [fill-docker-compose]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      - name: Conexión al servidor y deploy de nuxt
+        run: |
+          echo "${{ secrets.PREPROD_SECRET_KEY }}" > ~/prod_key.pem
+          chmod 600 ~/prod_key.pem
+          cd ${{ github.workspace }}
+          cd nuxt
+          cp .env.example .env
+          npm install
+          npm install -D sass
+          sed -i 's#VITE_APP_ENV=#VITE_APP_ENV=production#g' .env
+          sed -i 's#VITE_APP_API_PROD_URL=#VITE_APP_API_PROD_URL=${{secrets.API_PREPROD_URL}}#g' .env
+          sed -i 's#VITE_APP_MONGO_API_PROD_URL=#VITE_APP_MONGO_API_PROD_URL=${{secrets.MONGO_API_PREPROD_URL}}#g' .env
+          sed -i 's#VITE_APP_MONGO_IMG_DEV_URL=#VITE_APP_MONGO_IMG_DEV_URL=${{secrets.MONGO_IMAGE_PREPROD_URL}}#g' .env
+          sed -i 's#VITE_APP_SPOTIFY_CLIENT_ID=#VITE_APP_SPOTIFY_CLIENT_ID=${{ secrets.SPOTIFY_CLIENT_ID }}#g' .env
+          sed -i 's#VITE_APP_SPOTIFY_CLIENT_SECRET=#VITE_APP_SPOTIFY_CLIENT_SECRET=${{ secrets.SPOTIFY_CLIENT_SECRET }}#g' .env
+          sed -i 's#VITE_APP_SPOTIFY_REDIRECT_URI=#VITE_APP_SPOTIFY_REDIRECT_URI=${{ secrets.SPOTIFY_REDIRECT_PRE_URI }}#g' .env
+          sed -i 's#VITE_APP_GOOGLE_CLIENT_ID=#VITE_APP_GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}#g' .env
+          sed -i 's#VITE_APP_GOOGLE_CLIENT_SECRET=#VITE_APP_GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}#g' .env
+          sed -i 's#VITE_APP_GOOGLE_REDIRECT_URI=#VITE_APP_GOOGLE_REDIRECT_URI=${{ secrets.GOOGLE_REDIRECT_PRE_URI }}#g' .env
+          sed -i 's#VITE_APP_MAPBOX_TOKEN=#VITE_APP_MAPBOX_TOKEN=${{ secrets.MAPBOX_TOKEN }}#g' .env
+          sed -i 's#VITE_APP_IMAGE_URL=#VITE_APP_IMAGE_URL=${{ secrets.PRE_PROD_IMAGE_URL }}#g' .env
+          npm run build
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PROD_USER }}@${{ secrets.PRE_PROD_HOST }} "[ -d nuxt ] && sudo rm -r nuxt"
+          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i "~/prod_key.pem" -r .output ${{ secrets.PROD_USER }}@${{ secrets.PRE_PROD_HOST }}:nuxt
+      - run: echo "🍏 This job's status is ${{ job.status }}."
+
+  start-docker:
+    needs:
+      [
+        deployment-laravel,
+        deployment-node,
+        deployment-nuxt,
+        deployment-nodeChat,
+      ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Conexión al servidor y start de docker-compose
+        run: |
+          echo "${{ secrets.PREPROD_SECRET_KEY }}" > ~/prod_key.pem
+          chmod 600 ~/prod_key.pem
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/prod_key.pem ${{ secrets.PROD_USER }}@${{ secrets.PRE_PROD_HOST }} "docker compose up -d"
+      - run: echo "🍏 This job's status is ${{ job.status }}."

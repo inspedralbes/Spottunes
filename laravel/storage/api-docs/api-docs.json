@@ -1,0 +1,2160 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Documentació de la nostra API",
+        "description": "",
+        "contact": {
+            "name": "Equip de Spottunes",
+            "email": "a20pedgarguz@inspedralbes.cat"
+        },
+        "license": {
+            "name": "Licencia API",
+            "url": "http://www.example.com/licenses/api"
+        },
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/events/all": {
+            "get": {
+                "tags": [
+                    "Esdeveniments"
+                ],
+                "summary": "Obtenir llista completa d'esdeveniments",
+                "description": "Obté una llista completa d'esdeveniments on el camp 'artist' no és nul, ordenats per data i hora.",
+                "operationId": "getAllEvents",
+                "responses": {
+                    "200": {
+                        "description": "Llista d'esdeveniments obtinguda amb èxit",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "events": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "artist": {
+                                                        "type": "string",
+                                                        "example": "Artista Exemple"
+                                                    },
+                                                    "date": {
+                                                        "type": "string",
+                                                        "format": "date",
+                                                        "example": "2024-06-01"
+                                                    },
+                                                    "time": {
+                                                        "type": "string",
+                                                        "format": "time",
+                                                        "example": "19:00:00"
+                                                    },
+                                                    "location": {
+                                                        "type": "string",
+                                                        "example": "Lloc Exemple"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No s'han trobat esdeveniments",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No s'han trobat esdeveniments"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autoritzat",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Token no proporcionat als encapçalaments."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/events/byLocation": {
+            "post": {
+                "tags": [
+                    "Esdeveniments"
+                ],
+                "summary": "Obtenir esdeveniments per ubicació",
+                "description": "Obté una llista d'esdeveniments filtrats per països, ciutats i llocs específics, on el camp 'artist' no és nul, ordenats per data i hora.",
+                "operationId": "getEventsByLocation",
+                "requestBody": {
+                    "description": "Criteris de cerca per ubicació",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "countries",
+                                    "cities"
+                                ],
+                                "properties": {
+                                    "countries": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        },
+                                        "example": [
+                                            "USA",
+                                            "Espanya"
+                                        ]
+                                    },
+                                    "cities": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        },
+                                        "example": [
+                                            "Nova York",
+                                            "Madrid"
+                                        ]
+                                    },
+                                    "venues": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        },
+                                        "example": [
+                                            "Madison Square Garden",
+                                            "Wanda Metropolitano"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Llista d'esdeveniments obtinguda amb èxit",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "events": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "artist": {
+                                                        "type": "string",
+                                                        "example": "Artista Exemple"
+                                                    },
+                                                    "date": {
+                                                        "type": "string",
+                                                        "format": "date",
+                                                        "example": "2024-06-01"
+                                                    },
+                                                    "time": {
+                                                        "type": "string",
+                                                        "format": "time",
+                                                        "example": "19:00:00"
+                                                    },
+                                                    "location": {
+                                                        "type": "string",
+                                                        "example": "Lloc Exemple"
+                                                    },
+                                                    "country": {
+                                                        "type": "string",
+                                                        "example": "USA"
+                                                    },
+                                                    "city": {
+                                                        "type": "string",
+                                                        "example": "Nova York"
+                                                    },
+                                                    "venue": {
+                                                        "type": "string",
+                                                        "example": "Madison Square Garden"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Dades d'entrada invàlides",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "errors": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No s'han trobat esdeveniments pels criteris especificats",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No s'han trobat esdeveniments pels criteris especificats"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error en obtenir els esdeveniments",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error en obtenir els esdeveniments"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Detall de l'error"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autoritzat",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Token no proporcionat als encapçalaments."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/events/byDistance": {
+            "post": {
+                "tags": [
+                    "Esdeveniments"
+                ],
+                "summary": "Obtenir esdeveniments per distància",
+                "description": "Obté una llista d'esdeveniments dins d'una distància específica des d'una ubicació donada, on el camp 'artist' no és nul, ordenats per data i hora.",
+                "operationId": "getEventsByDistance",
+                "requestBody": {
+                    "description": "Criteris de cerca per distància",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "latitude",
+                                    "longitude",
+                                    "distance"
+                                ],
+                                "properties": {
+                                    "latitude": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 40.7128
+                                    },
+                                    "longitude": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": -74.006
+                                    },
+                                    "distance": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 50
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Llista d'esdeveniments obtinguda amb èxit",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "events": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "artist": {
+                                                        "type": "string",
+                                                        "example": "Artista Exemple"
+                                                    },
+                                                    "date": {
+                                                        "type": "string",
+                                                        "format": "date",
+                                                        "example": "2024-06-01"
+                                                    },
+                                                    "time": {
+                                                        "type": "string",
+                                                        "format": "time",
+                                                        "example": "19:00:00"
+                                                    },
+                                                    "location": {
+                                                        "type": "string",
+                                                        "example": "Lloc Exemple"
+                                                    },
+                                                    "distance": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 30.5
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Dades d'entrada invàlides",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "errors": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No s'han trobat esdeveniments pels criteris especificats",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No s'han trobat esdeveniments pels criteris especificats"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error en obtenir els esdeveniments",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error en obtenir els esdeveniments"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Detall de l'error"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autoritzat",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Token no proporcionat als encapçalaments."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/events/search": {
+            "post": {
+                "tags": [
+                    "Esdeveniments"
+                ],
+                "summary": "Buscar esdeveniments per nom",
+                "description": "Obté una llista d'esdeveniments que coincideixen amb el nom especificat en el paràmetre de cerca, cercant en diverses columnes de la taula d'esdeveniments.",
+                "operationId": "getEventsByName",
+                "requestBody": {
+                    "description": "Paràmetre de cerca per nom",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "param"
+                                ],
+                                "properties": {
+                                    "param": {
+                                        "type": "string",
+                                        "example": "Nom de l'esdeveniment o artista"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Llista d'esdeveniments obtinguda amb èxit",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "events": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "artist": {
+                                                        "type": "string",
+                                                        "example": "Artista Exemple"
+                                                    },
+                                                    "date": {
+                                                        "type": "string",
+                                                        "format": "date",
+                                                        "example": "2024-06-01"
+                                                    },
+                                                    "time": {
+                                                        "type": "string",
+                                                        "format": "time",
+                                                        "example": "19:00:00"
+                                                    },
+                                                    "location": {
+                                                        "type": "string",
+                                                        "example": "Lloc Exemple"
+                                                    },
+                                                    "country": {
+                                                        "type": "string",
+                                                        "example": "USA"
+                                                    },
+                                                    "city": {
+                                                        "type": "string",
+                                                        "example": "Nova York"
+                                                    },
+                                                    "venue": {
+                                                        "type": "string",
+                                                        "example": "Madison Square Garden"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Dades d'entrada invàlides",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "errors": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No s'han trobat esdeveniments per als criteris especificats",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No s'han trobat esdeveniments per als criteris especificats"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error en obtenir esdeveniments",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error en obtenir esdeveniments"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Detall de l'error"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autoritzat",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Token no proporcionat en les capçaleres."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/events/locations": {
+            "get": {
+                "tags": [
+                    "Esdeveniments"
+                ],
+                "summary": "Obtenir ubicacions d'esdeveniments",
+                "description": "Obté una llista de països, ciutats i llocs on es realitzen esdeveniments.",
+                "operationId": "getLocations",
+                "responses": {
+                    "200": {
+                        "description": "Ubicacions d'esdeveniments obtingudes amb èxit",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "locations": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "country": {
+                                                        "type": "string",
+                                                        "example": "USA"
+                                                    },
+                                                    "cities": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "properties": {
+                                                                "city": {
+                                                                    "type": "string",
+                                                                    "example": "Nova York"
+                                                                },
+                                                                "venues": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "properties": {
+                                                                            "venue": {
+                                                                                "type": "string",
+                                                                                "example": "Madison Square Garden"
+                                                                            },
+                                                                            "latitude": {
+                                                                                "type": "number",
+                                                                                "format": "float",
+                                                                                "example": 40.7505
+                                                                            },
+                                                                            "longitude": {
+                                                                                "type": "number",
+                                                                                "format": "float",
+                                                                                "example": -73.9934
+                                                                            }
+                                                                        },
+                                                                        "type": "object"
+                                                                    }
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No s'han trobat ubicacions d'esdeveniments",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No s'han trobat ubicacions per als esdeveniments"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error en obtenir ubicacions d'esdeveniments",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error en obtenir les ubicacions dels esdeveniments"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Error: "
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/events/byId": {
+            "post": {
+                "tags": [
+                    "Esdeveniments"
+                ],
+                "summary": "Mostrar events per IDs",
+                "description": "Obté una llista d'esdeveniments segons els IDs proporcionats en el cos de la sol·licitud.",
+                "operationId": "showEvents",
+                "requestBody": {
+                    "description": "IDs dels esdeveniments",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "ids"
+                                ],
+                                "properties": {
+                                    "ids": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer",
+                                            "example": "1"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Esdeveniments trobats",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "events": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "artist": {
+                                                        "type": "string",
+                                                        "example": "Artista Exemple"
+                                                    },
+                                                    "date": {
+                                                        "type": "string",
+                                                        "format": "date",
+                                                        "example": "2024-06-01"
+                                                    },
+                                                    "time": {
+                                                        "type": "string",
+                                                        "format": "time",
+                                                        "example": "19:00:00"
+                                                    },
+                                                    "location": {
+                                                        "type": "string",
+                                                        "example": "Lloc Exemple"
+                                                    },
+                                                    "country": {
+                                                        "type": "string",
+                                                        "example": "USA"
+                                                    },
+                                                    "city": {
+                                                        "type": "string",
+                                                        "example": "Nova York"
+                                                    },
+                                                    "venue": {
+                                                        "type": "string",
+                                                        "example": "Madison Square Garden"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "IDs invàlids",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "IDs invàlids proporcionats"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Esdeveniments no trobats",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Esdeveniments no trobats"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/users/follow/{userId}": {
+            "post": {
+                "tags": [
+                    "Seguidors"
+                ],
+                "summary": "Segueix a un usuari",
+                "description": "Permet a un usuari seguir a un altre usuari per la seva ID.",
+                "operationId": "followUser",
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "description": "ID de l'usuari a seguir",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Ara estàs seguint a aquest usuari",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Ara estàs seguint a aquest usuari"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Ja estàs seguint a aquest usuari",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Ja estàs seguint a aquest usuari"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Usuari no trobat",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Usuari no trobat"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autoritzat",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Token no proporcionat als encapçalaments."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearer_token": []
+                    }
+                ]
+            }
+        },
+        "/api/users/unfollow/{userId}": {
+            "delete": {
+                "tags": [
+                    "Seguidors"
+                ],
+                "summary": "Deixar de seguir a un usuari",
+                "description": "Permet a un usuari deixar de seguir a un altre usuari per la seva ID.",
+                "operationId": "unfollowUser",
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "description": "ID de l'usuari a deixar de seguir",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Ja no estàs seguint a aquest usuari",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Ja no estàs seguint a aquest usuari"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Usuari no trobat",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Usuari no trobat"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autoritzat",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Token no proporcionat als encapçalaments."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearer_token": []
+                    }
+                ]
+            }
+        },
+        "/api/users/followers/{userId}": {
+            "get": {
+                "tags": [
+                    "Seguidors"
+                ],
+                "summary": "Obtenir seguidors d'un usuari",
+                "description": "Obté la llista de seguidors d'un usuari per la seva ID, incloent el compte total de seguidors.",
+                "operationId": "getUserFollowers",
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "description": "ID de l'usuari del qual es volen obtenir els seguidors",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Llista de seguidors obtinguda amb èxit",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "count": {
+                                            "type": "integer",
+                                            "example": 10
+                                        },
+                                        "followers": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "nickname": {
+                                                        "type": "string",
+                                                        "example": "seguidor123"
+                                                    },
+                                                    "avatar": {
+                                                        "type": "string",
+                                                        "example": "imatges/imatge_seguidor.png"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Usuari no trobat",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Usuari no trobat"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autoritzat",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Token no proporcionat als encapçalaments."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearer_token": []
+                    }
+                ]
+            }
+        },
+        "/api/users/followed/{userId}": {
+            "get": {
+                "tags": [
+                    "Seguidors"
+                ],
+                "summary": "Obtenir usuaris seguits per un usuari",
+                "description": "Obté la llista d'usuaris seguits per un usuari per la seva ID, incloent el compte total d'usuaris seguits.",
+                "operationId": "getUserFollowed",
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "description": "ID de l'usuari del qual es volen obtenir els usuaris seguits",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Llista d'usuaris seguits obtinguda amb èxit",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "count": {
+                                            "type": "integer",
+                                            "example": 10
+                                        },
+                                        "followed": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 2
+                                                    },
+                                                    "nickname": {
+                                                        "type": "string",
+                                                        "example": "usuariSeguit123"
+                                                    },
+                                                    "avatar": {
+                                                        "type": "string",
+                                                        "example": "imatges/imatge_usuari_seguidor.png"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Usuari no trobat",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Usuari no trobat"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autoritzat",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Token no proporcionat als encapçalaments."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearer_token": []
+                    }
+                ]
+            }
+        },
+        "/api/users/followers": {
+            "get": {
+                "tags": [
+                    "Seguidors"
+                ],
+                "summary": "Obtenir seguidors de l'usuari autenticat",
+                "description": "Obté la llista d'IDs dels usuaris que segueixen a l'usuari autenticat.",
+                "operationId": "getFollowers",
+                "responses": {
+                    "200": {
+                        "description": "Llista de seguidors obtinguda amb èxit",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "integer",
+                                        "example": 2
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autoritzat",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Token no proporcionat als encapçalaments."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearer_token": []
+                    }
+                ]
+            }
+        },
+        "/api/login": {
+            "post": {
+                "tags": [
+                    "Autenticació"
+                ],
+                "summary": "Iniciar sessió d'usuari",
+                "description": "Inicia sessió d'un usuari amb correu electrònic i contrasenya.",
+                "operationId": "0fc9610184083ac6dddab2c63139225a",
+                "parameters": [
+                    {
+                        "name": "email",
+                        "in": "query",
+                        "description": "Correu electrònic de l'usuari",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "password",
+                        "in": "query",
+                        "description": "Contrasenya de l'usuari",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "password"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Inici de sessió exitós",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "string",
+                                            "example": "Has iniciat sessió"
+                                        },
+                                        "token": {
+                                            "type": "string",
+                                            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error en la sol·licitud",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/register": {
+            "post": {
+                "tags": [
+                    "Autenticació"
+                ],
+                "summary": "Registre d'usuari",
+                "description": "Registra un nou usuari amb les dades proporcionades.",
+                "operationId": "2f25885f3b6f61ca11724ec302d2e439",
+                "parameters": [
+                    {
+                        "name": "name",
+                        "in": "query",
+                        "description": "Nom de l'usuari",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "surnames",
+                        "in": "query",
+                        "description": "Cognoms de l'usuari",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "nickname",
+                        "in": "query",
+                        "description": "Àlies o nom d'usuari",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "email",
+                        "in": "query",
+                        "description": "Correu electrònic de l'usuari",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "email"
+                        }
+                    },
+                    {
+                        "name": "birthdate",
+                        "in": "query",
+                        "description": "Data de naixement de l'usuari (format: AAAA-MM-DD)",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "password",
+                        "in": "query",
+                        "description": "Contrasenya de l'usuari",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "password"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Registre exitós",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "string",
+                                            "example": "Usuari creat correctament"
+                                        },
+                                        "token": {
+                                            "type": "string",
+                                            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error en la sol·licitud",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "errors": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/logout": {
+            "post": {
+                "tags": [
+                    "Autenticació"
+                ],
+                "summary": "Tancar sessió",
+                "description": "Tanca la sessió de l'usuari actual i revoca tots els tokens d'accés associats.",
+                "operationId": "logout",
+                "responses": {
+                    "200": {
+                        "description": "Sessió tancada amb èxit",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "string",
+                                            "example": "Has tancat sessió"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autoritzat"
+                    }
+                },
+                "security": [
+                    {
+                        "bearer_token": []
+                    }
+                ]
+            }
+        },
+        "/api/completeInfo": {
+            "put": {
+                "tags": [
+                    "Autenticació"
+                ],
+                "summary": "Completar informació d'usuari",
+                "description": "Completa la informació d'un usuari, com la seva data de naixement i àlies.",
+                "operationId": "completeInfo",
+                "requestBody": {
+                    "description": "Dades d'usuari per completar",
+                    "required": true,
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "required": [
+                                    "birthdate",
+                                    "nickname"
+                                ],
+                                "properties": {
+                                    "birthdate": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "1990-01-01"
+                                    },
+                                    "nickname": {
+                                        "type": "string",
+                                        "example": "usuari123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Informació d'usuari completada amb èxit",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "boolean"
+                                },
+                                "example": true
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error de validació",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "errors": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autoritzat",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Token no proporcionat en els encapçalaments."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearer_token": []
+                    }
+                ]
+            }
+        },
+        "/api/updateInfo": {
+            "put": {
+                "tags": [
+                    "Autenticació"
+                ],
+                "summary": "Actualitzar informació de l'usuari",
+                "description": "Actualitza la informació de l'usuari, incloent nom, cognoms, àlies, correu electrònic, data de naixement i avatar.",
+                "operationId": "updateInfo",
+                "requestBody": {
+                    "description": "Dades de l'usuari per actualitzar",
+                    "required": true,
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "nickname",
+                                    "email"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Juan"
+                                    },
+                                    "surnames": {
+                                        "type": "string",
+                                        "example": "Pérez Gómez"
+                                    },
+                                    "nickname": {
+                                        "type": "string",
+                                        "example": "usuari123"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "usuari@example.com"
+                                    },
+                                    "birthdate": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "1990-01-01"
+                                    },
+                                    "avatar": {
+                                        "type": "string",
+                                        "format": "base64",
+                                        "example": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUA..."
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Informació de l'usuari actualitzada amb èxit",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "example": "Juan"
+                                        },
+                                        "surnames": {
+                                            "type": "string",
+                                            "example": "Pérez Gómez"
+                                        },
+                                        "nickname": {
+                                            "type": "string",
+                                            "example": "usuari123"
+                                        },
+                                        "email": {
+                                            "type": "string",
+                                            "format": "email",
+                                            "example": "usuari@example.com"
+                                        },
+                                        "birthdate": {
+                                            "type": "string",
+                                            "format": "date",
+                                            "example": "1990-01-01"
+                                        },
+                                        "avatar": {
+                                            "type": "string",
+                                            "example": "images/unique_image_name.png"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error de validació",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "errors": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autoritzat",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Token no proporcionat en els encapçalaments."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearer_token": []
+                    }
+                ]
+            }
+        },
+        "/api/apps/searchUsers": {
+            "post": {
+                "tags": [
+                    "Usuaris"
+                ],
+                "summary": "Cerca d'usuaris",
+                "description": "Cerca d'usuaris pel seu àlies.",
+                "operationId": "searchUsers",
+                "parameters": [
+                    {
+                        "name": "param",
+                        "in": "query",
+                        "description": "Paràmetre de cerca per al àlies de l'usuari",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "usuari123"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Resultats de la cerca",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "name": {
+                                                "type": "string",
+                                                "example": "Juan"
+                                            },
+                                            "surnames": {
+                                                "type": "string",
+                                                "example": "Pérez Gómez"
+                                            },
+                                            "nickname": {
+                                                "type": "string",
+                                                "example": "usuari123"
+                                            },
+                                            "email": {
+                                                "type": "string",
+                                                "format": "email",
+                                                "example": "usuari@example.com"
+                                            },
+                                            "birthdate": {
+                                                "type": "string",
+                                                "format": "date",
+                                                "example": "1990-01-01"
+                                            },
+                                            "avatar": {
+                                                "type": "string",
+                                                "example": "images/unique_image_name.png"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "201": {
+                        "description": "No hi ha resultats en la teva cerca",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No hi ha resultats en la teva cerca"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "202": {
+                        "description": "No hi ha resultats en la teva cerca",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No hi ha resultats en la teva cerca"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autoritzat",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Token no proporcionat en els encapçalaments."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearer_token": []
+                    }
+                ]
+            }
+        },
+        "/api/apps/checkEmail": {
+            "get": {
+                "tags": [
+                    "Usuaris"
+                ],
+                "summary": "Verificar disponibilitat de correu electrònic",
+                "description": "Verifica si un correu electrònic ja està en ús. Si el correu està en ús, retorna els detalls de l'usuari i un token d'accés. Si no està en ús, indica que el correu està disponible.",
+                "operationId": "checkEmail",
+                "requestBody": {
+                    "description": "Correu electrònic a verificar",
+                    "required": true,
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "required": [
+                                    "email"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "usuari@example.com"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "El correu electrònic ja està en ús, iniciant sessió",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "string",
+                                            "example": "El correu electrònic ja està en ús, iniciant sessió"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "user": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "Juan"
+                                                        },
+                                                        "surnames": {
+                                                            "type": "string",
+                                                            "example": "Pérez Gómez"
+                                                        },
+                                                        "nickname": {
+                                                            "type": "string",
+                                                            "example": "usuari123"
+                                                        },
+                                                        "email": {
+                                                            "type": "string",
+                                                            "format": "email",
+                                                            "example": "usuari@example.com"
+                                                        },
+                                                        "birthdate": {
+                                                            "type": "string",
+                                                            "format": "date",
+                                                            "example": "1990-01-01"
+                                                        },
+                                                        "avatar": {
+                                                            "type": "string",
+                                                            "example": "images/unique_image_name.png"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "token": {
+                                                    "type": "string",
+                                                    "example": "abc123token"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "202": {
+                        "description": "El correu electrònic està disponible",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "string",
+                                            "example": "El correu electrònic està disponible"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Sol·licitud incorrecta",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Sol·licitud incorrecta"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autoritzat",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Token no proporcionat en els encapçalaments."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearer_token": []
+                    }
+                ]
+            }
+        },
+        "/api/getUser": {
+            "get": {
+                "tags": [
+                    "Usuaris"
+                ],
+                "summary": "Obtenir informació de l'usuari",
+                "description": "Obté la informació d'un usuari pel seu ID.",
+                "operationId": "getUser",
+                "parameters": [
+                    {
+                        "name": "user_id",
+                        "in": "query",
+                        "description": "ID de l'usuari a obtenir",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Informació de l'usuari obtinguda exitosament",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "example": "Juan"
+                                        },
+                                        "surnames": {
+                                            "type": "string",
+                                            "example": "Pérez Gómez"
+                                        },
+                                        "nickname": {
+                                            "type": "string",
+                                            "example": "usuari123"
+                                        },
+                                        "email": {
+                                            "type": "string",
+                                            "format": "email",
+                                            "example": "usuari@example.com"
+                                        },
+                                        "birthdate": {
+                                            "type": "string",
+                                            "format": "date",
+                                            "example": "1990-01-01"
+                                        },
+                                        "avatar": {
+                                            "type": "string",
+                                            "example": "images/unique_image_name.png"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No s'ha pogut trobar l'usuari",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "No s'ha pogut trobar l'usuari"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autoritzat",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Token no proporcionat en els encapçalaments."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearer_token": []
+                    }
+                ]
+            }
+        },
+        "/api/users/search/{username}": {
+            "get": {
+                "tags": [
+                    "Usuaris"
+                ],
+                "summary": "Cercar usuari per nom d'usuari",
+                "description": "Cerca un usuari pel seu nom d'usuari.",
+                "operationId": "searchByUsername",
+                "parameters": [
+                    {
+                        "name": "username",
+                        "in": "path",
+                        "description": "Nom d'usuari a cercar",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Usuari trobat exitosament",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "example": "Juan"
+                                        },
+                                        "nickname": {
+                                            "type": "string",
+                                            "example": "usuari123"
+                                        },
+                                        "avatar": {
+                                            "type": "string",
+                                            "example": "images/unique_image_name.png"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No s'ha trobat l'usuari",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No s'ha trobat l'usuari"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autoritzat",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Token no proporcionat en els encapçalaments."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearer_token": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "bearer_token": {
+                "type": "apiKey",
+                "description": "Enter token in format (Bearer <token>)",
+                "name": "Authorization",
+                "in": "header"
+            }
+        }
+    }
+}
